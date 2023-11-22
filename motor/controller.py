@@ -1,5 +1,5 @@
-from Raspi_MotorHAT import Raspi_MotorHAT, Raspi_DCMotor
-from Raspi_PWM_Servo_Driver import PWM
+from motor.Raspi_MotorHAT import Raspi_MotorHAT, Raspi_DCMotor
+from motor.Raspi_PWM_Servo_Driver import PWM
 
 FORWARD = 0
 BACKWARD = 1
