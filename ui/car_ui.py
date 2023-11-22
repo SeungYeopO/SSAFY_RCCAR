@@ -1,13 +1,3 @@
-# -*- coding: utf-8 -*-
-
-################################################################################
-## Form generated from reading UI file 'carControlUI_ver2.ui'
-##
-## Created by: Qt User Interface Compiler version 5.15.2
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
-
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
@@ -16,8 +6,7 @@ from PySide2.QtWidgets import *
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
-            MainWindow.setObjectName(u"Control UI")
-        
+            MainWindow.setObjectName(u"MainWindow")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_2 = QGridLayout(self.centralwidget)
@@ -175,13 +164,6 @@ class Ui_MainWindow(object):
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")
         MainWindow.setStatusBar(self.statusbar)
-
-        self.gearBtn_1.setEnabled(True)
-        self.gearBtn_2.setDisabled(True)
-        self.gearBtn_3.setDisabled(True)
-        self.gearBtn_4.setDisabled(True)
-
-        self.gearLcd.display(1)
 
         self.retranslateUi(MainWindow)
         self.fwdBtn.pressed.connect(MainWindow.forward)
