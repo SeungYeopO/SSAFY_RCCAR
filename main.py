@@ -1,8 +1,9 @@
-import sys
 from PySide2.QtWidgets import *
+from PySide2.QtCore import *
+
 from ui.car_ui import Ui_MainWindow
-from PySide2.QtCore import Qt
 from db.db_conncetor import Connector
+from motor.controller import MotorController, FORWARD, BACKWARD, MID, LEFT, RIGHT
 
 DB_ADDR = "43.202.6.43"
 DB_USERNAME = "user"
@@ -14,81 +15,133 @@ class MyApp(QMainWindow, Ui_MainWindow):
         super().__init__()
         self.setWindowTitle('key')
         self.setupUi(self)
+        self.setFixedSize(1080, 360)
         self.main()
-        self.setFixedSize(600, 360)
+        self.init()
+
+    def init(self):
         self.connector = Connector(DB_ADDR, DB_USERNAME, DB_PASSWORD, DB_NAME)
-        self.dir = "forward"
-        self.wheel_dir = "mid"
-        self.gear = 1
-        self.show()
+        self.controller = MotorController()
 
     def main(self):
         pass
 
+    def printLCD(self):
+        self.gearLcd.display(self.gear)
+        self.speedLcd.display(self.speed)
+        if self.gear == 1:
+            self.gearBtn_1.setEnabled(True)
+            self.gearBtn_2.setDisabled(True)
+            self.gearBtn_3.setDisabled(True)
+            self.gearBtn_4.setDisabled(True)
+
+        elif self.gear == 2:
+            self.gearBtn_1.setDisabled(True)
+            self.gearBtn_2.setEnabled(True)
+            self.gearBtn_3.setDisabled(True)
+            self.gearBtn_4.setDisabled(True)
+
+        elif self.gear == 3:
+            self.gearBtn_1.setDisabled(True)
+            self.gearBtn_2.setDisabled(True)
+            self.gearBtn_3.setEnabled(True)
+            self.gearBtn_4.setDisabled(True)
+
+        elif self.gear == 4:
+            self.gearBtn_1.setDisabled(True)
+            self.gearBtn_2.setDisabled(True)
+            self.gearBtn_3.setDisabled(True)
+            self.gearBtn_4.setEnabled(True)
+
+    def gear2speed(self, gear):
+        if gear == 1:
+            self.speed = 50
+        elif gear == 2:
+            self.speed = 100
+        elif gear == 3:
+            self.speed = 150
+        elif gear == 4:
+            self.speed = 200
+
     def forward(self):
         print('fwd')
-        self.dir = "forward"
-        self.connector.send("command", self.dir, self.wheel_dir, f"{self.gear}")
+        self.controller.dir = FORWARD
+        self.connector.send("command", self.controller.dir, self.controller.wheel_dir, f"{self.controller.gear}")
 
     def backward(self):
         print('bwd')
-        self.dir = "backward"
-        self.connector.send("command", self.dir, self.wheel_dir, f"{self.gear}")
+        self.controller.dir = BACKWARD
+        self.connector.send("command", self.controller.dir, self.controller.wheel_dir, f"{self.controller.gear}")
 
     def left(self):
         print('left')
-        self.wheel_dir = "left"
-        self.connector.send("command", self.dir, self.wheel_dir, f"{self.gear}")
+        self.controller.wheel_dir = LEFT
+        self.connector.send("command", self.controller.dir, self.controller.wheel_dir, f"{self.controller.gear}")
 
     def right(self):
         print('right')
-        self.wheel_dir = "right"
-        self.connector.send("command", self.dir, self.wheel_dir, f"{self.gear}")
+        self.controller.wheel_dir = RIGHT
+        self.connector.send("command", self.controller.dir, self.controller.wheel_dir, f"{self.controller.gear}")
 
     def mid(self):
         print('mid')
-        self.wheel_dir = "mid"
-        self.connector.send("command", self.dir, self.wheel_dir, f"{self.gear}")
+        self.speed = 0
+        self.printLCD()
+        self.controller.wheel_dir = MID
+        self.connector.send("command", self.controller.dir, self.controller.wheel_dir, f"{self.controller.gear}")
 
     def gearUP(self):
         print('gear up')
+
         if self.gear < 4:
             self.gear += 1
-            self.connector.send("command", self.dir, self.wheel_dir, f"{self.gear}")
+        else:
+            print("Highest Gear")
+
+        self.gear2speed(self.gear)
+        self.printLCD()
 
     def gearDWN(self):
         print('gear down')
-        if self.gear > 0:
+
+        if self.gear > 1:
             self.gear -= 1
-            self.connector.send("command", self.dir, self.wheel_dir, f"{self.gear}")
+        else:
+            print("Loweset Gear")
+
+        self.gear2speed(self.gear)
+        self.printLCD()
 
     def gearFirst(self):
+        self.gear = 1
         print('gear 1')
-        self.gearBtn_1.setEnabled(True)
-        self.gearBtn_2.setDisabled(True)
-        self.gearBtn_3.setDisabled(True)
-        self.gearBtn_4.setDisabled(True)
+        #self.gearLcd.display(self.gear)
+        self.gear2speed(self.gear)
+        self.printLCD()
 
     def gearSecond(self):
+        self.gear = 2
+        self.speed = 100
         print('gear 2')
-        self.gearBtn_1.setDisabled(True)
-        self.gearBtn_2.setEnabled(True)
-        self.gearBtn_3.setDisabled(True)
-        self.gearBtn_4.setDisabled(True)
+        #self.gearLcd.display(self.gear)
+        self.gear2speed(self.gear)
+        self.printLCD()
 
     def gearThird(self):
+        self.gear = 3
         print('gear 3')
-        self.gearBtn_1.setDisabled(True)
-        self.gearBtn_2.setDisabled(True)
-        self.gearBtn_3.setEnabled(True)
-        self.gearBtn_4.setDisabled(True)
+        #self.gearLcd.display(self.gear)
+        self.gear2speed(self.gear)
+        self.printLCD()
 
     def gearFourth(self):
+        self.gear = 4
+        self.speed = 200
         print('gear 4')
-        self.gearBtn_1.setDisabled(True)
-        self.gearBtn_2.setDisabled(True)
-        self.gearBtn_3.setDisabled(True)
-        self.gearBtn_4.setEnabled(True)
+        #self.gearLcd.display(self.gear)
+        self.gear2speed(self.gear)
+        self.printLCD()
+
 
     def keyPressEvent(self, e):
         if e.key() in [Qt.Key_Return, Qt.Key_Enter]:
@@ -97,16 +150,22 @@ class MyApp(QMainWindow, Ui_MainWindow):
             self.close()
         elif e.key() == Qt.Key_K:
             self.right()
+            self.rightBtn.setDisabled(True)
         elif e.key() == Qt.Key_H:
             self.left()
+            self.leftBtn.setDisabled(True)
         elif e.key() == Qt.Key_U:
             self.forward()
+            self.fwdBtn.setDisabled(True)
         elif e.key() == Qt.Key_J:
             self.backward()
+            self.bwdBtn.setDisabled(True)
         elif e.key() == Qt.Key_Q:
             self.gearUP()
+            self.gupBtn.setDisabled(True)
         elif e.key() == Qt.Key_W:
             self.gearDWN()
+            self.gdwnBtn.setDisabled(True)
         elif e.key() == Qt.Key_1:
             self.gearFirst()
         elif e.key() == Qt.Key_2:
@@ -116,11 +175,23 @@ class MyApp(QMainWindow, Ui_MainWindow):
         elif e.key() == Qt.Key_4:
             self.gearFourth()
 
-        # if not control and isPrintable(e.key()):
-        #     print(e.text())
+    def keyReleaseEvent(self, e):
+        if e.key() == Qt.Key_H:
+            self.leftBtn.setEnabled(True)
+        elif e.key() == Qt.Key_K:
+            self.rightBtn.setEnabled(True)
+        elif e.key() == Qt.Key_U:
+            self.fwdBtn.setEnabled(True)
+        elif e.key() == Qt.Key_J:
+            self.bwdBtn.setEnabled(True)
+        elif e.key() == Qt.Key_Q:
+            self.gupBtn.setEnabled(True)
+        elif e.key() == Qt.Key_W:
+            self.gdwnBtn.setEnabled(True)
 
 
 if __name__ == '__main__':
     app = QApplication()
     win = MyApp()
+    win.show()
     app.exec_()
