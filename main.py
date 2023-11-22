@@ -3,7 +3,7 @@ from PySide2.QtCore import *
 
 from ui.car_ui import Ui_MainWindow
 from db.db_conncetor import Connector
-from motor.controller import MotorController, FORWARD, BACKWARD, MID, LEFT, RIGHT
+from motor.controller import MotorController, FORWARD, BACKWARD, MID, LEFT, RIGHT, STOP
 
 DB_ADDR = "43.202.6.43"
 DB_USERNAME = "user"
@@ -16,130 +16,111 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.setWindowTitle('key')
         self.setupUi(self)
         self.setFixedSize(1080, 360)
-        self.main()
         self.init()
 
     def init(self):
         self.connector = Connector(DB_ADDR, DB_USERNAME, DB_PASSWORD, DB_NAME)
         self.controller = MotorController()
 
-    def main(self):
-        pass
-
     def printLCD(self):
-        self.gearLcd.display(self.gear)
-        self.speedLcd.display(self.speed)
-        if self.gear == 1:
+        self.gearLcd.display(self.controller.gear)
+        self.speedLcd.display(self.controller.speed)
+        if self.controller.gear == 1:
             self.gearBtn_1.setEnabled(True)
             self.gearBtn_2.setDisabled(True)
             self.gearBtn_3.setDisabled(True)
             self.gearBtn_4.setDisabled(True)
 
-        elif self.gear == 2:
+        elif self.controller.gear == 2:
             self.gearBtn_1.setDisabled(True)
             self.gearBtn_2.setEnabled(True)
             self.gearBtn_3.setDisabled(True)
             self.gearBtn_4.setDisabled(True)
 
-        elif self.gear == 3:
+        elif self.controller.gear == 3:
             self.gearBtn_1.setDisabled(True)
             self.gearBtn_2.setDisabled(True)
             self.gearBtn_3.setEnabled(True)
             self.gearBtn_4.setDisabled(True)
 
-        elif self.gear == 4:
+        elif self.controller.gear == 4:
             self.gearBtn_1.setDisabled(True)
             self.gearBtn_2.setDisabled(True)
             self.gearBtn_3.setDisabled(True)
             self.gearBtn_4.setEnabled(True)
 
-    def gear2speed(self, gear):
-        if gear == 1:
-            self.speed = 50
-        elif gear == 2:
-            self.speed = 100
-        elif gear == 3:
-            self.speed = 150
-        elif gear == 4:
-            self.speed = 200
 
     def forward(self):
         print('fwd')
-        self.controller.dir = FORWARD
+        self.controller.set_dir(FORWARD)
+        self.controller.set_speed()
         self.connector.send("command", self.controller.dir, self.controller.wheel_dir, f"{self.controller.gear}")
 
     def backward(self):
         print('bwd')
-        self.controller.dir = BACKWARD
+        self.controller.set_dir(BACKWARD)
+        self.controller.set_speed()
         self.connector.send("command", self.controller.dir, self.controller.wheel_dir, f"{self.controller.gear}")
 
     def left(self):
         print('left')
-        self.controller.wheel_dir = LEFT
+        self.controller.set_wheel_dir(LEFT)
         self.connector.send("command", self.controller.dir, self.controller.wheel_dir, f"{self.controller.gear}")
 
     def right(self):
         print('right')
-        self.controller.wheel_dir = RIGHT
+        self.controller.set_wheel_dir(RIGHT)
         self.connector.send("command", self.controller.dir, self.controller.wheel_dir, f"{self.controller.gear}")
 
     def mid(self):
         print('mid')
-        self.speed = 0
+        self.controller.set_dir(STOP)
+        self.controller.set_wheel_dir(MID)
+        self.controller.set_speed()
         self.printLCD()
-        self.controller.wheel_dir = MID
         self.connector.send("command", self.controller.dir, self.controller.wheel_dir, f"{self.controller.gear}")
 
     def gearUP(self):
         print('gear up')
 
-        if self.gear < 4:
-            self.gear += 1
+        if self.controller.gear < 4:
+            self.controller.set_gear(self.controller.gear + 1)
         else:
             print("Highest Gear")
 
-        self.gear2speed(self.gear)
+        self.controller.set_speed()
         self.printLCD()
 
     def gearDWN(self):
         print('gear down')
 
-        if self.gear > 1:
-            self.gear -= 1
+        if self.controller.gear > 1:
+            self.controller.set_gear(self.controller.gear - 1)
         else:
             print("Loweset Gear")
 
-        self.gear2speed(self.gear)
         self.printLCD()
 
     def gearFirst(self):
-        self.gear = 1
+        self.controller.set_gear(1)
         print('gear 1')
-        #self.gearLcd.display(self.gear)
-        self.gear2speed(self.gear)
         self.printLCD()
 
     def gearSecond(self):
-        self.gear = 2
+        self.controller.set_gear(2)
         self.speed = 100
         print('gear 2')
-        #self.gearLcd.display(self.gear)
-        self.gear2speed(self.gear)
         self.printLCD()
 
     def gearThird(self):
-        self.gear = 3
+        self.controller.set_gear(3)
         print('gear 3')
-        #self.gearLcd.display(self.gear)
-        self.gear2speed(self.gear)
         self.printLCD()
 
     def gearFourth(self):
-        self.gear = 4
+        self.controller.set_gear(4)
         self.speed = 200
         print('gear 4')
-        #self.gearLcd.display(self.gear)
-        self.gear2speed(self.gear)
         self.printLCD()
 
 
