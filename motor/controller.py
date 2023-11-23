@@ -33,51 +33,50 @@ class MotorController():
         if w_dir == MID:
             self.wheel_dir = MID
             self.servo_motor.setPWM(0, 0, 350)
-            print("WHEEL DIR : MID")
+            # print("WHEEL DIR : MID")
         elif w_dir == LEFT:
             self.wheel_dir = LEFT
             self.servo_motor.setPWM(0, 0, 300)
-            print("WHEEL DIR : LEFT")
+            # print("WHEEL DIR : LEFT")
         elif w_dir == RIGHT:
             self.wheel_dir = RIGHT
             self.servo_motor.setPWM(0, 0, 400)
-            print("WHEEL DIR : RIGHT")
+            # print("WHEEL DIR : RIGHT")
 
     def set_gear(self, step):
         self.gear = step
-        print(f"GEAR : {step}")
+        # print(f"GEAR : {step}")
         self.set_speed()
         return
 
     def set_speed(self):
         self.speed = self.speed_profile[self.gear]
-        print(f"DIR : {self.dir}")
-        print(f"SPEED : {self.speed}")
+        # print(f"DIR : {self.dir}")
+        # print(f"SPEED : {self.speed}")
         
         self.main_motor.setSpeed(self.speed)
 
         if self.dir == STOP:
             self.main_motor.run(Raspi_MotorHAT.RELEASE)
-            print("MOTOR RELEASE")
+            # print("MOTOR RELEASE")
         elif self.dir == FORWARD:
             self.main_motor.run(Raspi_MotorHAT.FORWARD)
-            print("MOTOR FORWARD")
+            # print("MOTOR FORWARD")
         elif self.dir == BACKWARD:
             self.main_motor.run(Raspi_MotorHAT.BACKWARD)
-            print("MOTOR BACKWARD")
+            # print("MOTOR BACKWARD")
         return
 
     def stop(self):
-        self.speed = 0
-        self.main_motor.setSpeed(self.speed)
-        self.main_motor.run(Raspi_MotorHAT.RELEASE)
-        print("STOP")
-        pass
+        self.set_dir(STOP)
+        self.set_speed()
+        # print("STOP")
+        return
 
     def terminate(self):
         self.set_wheel_dir(MID)
         self.stop()
-        pass
+        return
 
 
 
